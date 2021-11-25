@@ -1,7 +1,8 @@
-from posts.models import Comment, Follow, Group, Post, User
 from rest_framework import serializers
-from rest_framework.generics import get_object_or_404
 from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueTogetherValidator
+
+from posts.models import Comment, Follow, Group, Post, User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -30,51 +31,27 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault())
     following = serializers.SlugRelatedField(
-        slug_field='username', queryset=User.objects.all())
+        slug_field='username',
+        queryset=User.objects.all())
 
-    def validate(self, data):
-        user = get_object_or_404(User, username=data['following'].username)
-        follow = Follow.objects.filter(
-            user=self.context['request'].user, following=user).exists()
-        if user == self.context['request'].user:
+    def validate_following(self, value):
+        if value.username == self.context['request'].user.username:
             raise serializers.ValidationError(
-                "Вы не можете подписаться сам на себя")
-        if follow is True:
-            raise serializers.ValidationError(
-                "Вы уже подписаны на пользователя")
-        return data
+                'Вы не можете подписаться сам на себя')
+        return value
 
     class Meta:
         model = Follow
         fields = ('user', 'following')
         read_only_fields = ('id', 'user')
-
-# class FollowSerializer(serializers.ModelSerializer):
-#     user = serializers.SlugRelatedField(
-#         slug_field='username',
-#         read_only=True,
-#         default=serializers.CurrentUserDefault(),
-#     )
-#     following = serializers.SlugRelatedField(
-#         slug_field='username',
-#         queryset=User.objects.all()
-#     )
-
-#     def validate_following(self, following):
-#         if self.context.get('request').method == 'POST':
-#             if self.context.get('request').user == following:
-#                 raise serializers.ValidationError(
-#                     'You can\'t follow to yourself.')
-#         return following
-
-#     class Meta:
-#         fields = ['user', 'following']
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=Follow.objects.all(),
-#                 fields=['user', 'following', ]
-#             )
-#         ]
-#         model = Follow
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'following', ]
+            )
+        ]
