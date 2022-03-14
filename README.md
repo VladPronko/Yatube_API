@@ -1,43 +1,30 @@
-### Как запустить проект:
+# Проект «API для Yatube»
+<a href='https://github.com/VladPronko/hw05_final'>Yatube</a> - социальная сеть для публикации личных дневников. В данном проекте реализована REST API для проекта Yatube.
 
-Клонировать репозиторий и перейти в него в командной строке:
+К проекту по адресу http://127.0.0.1:8000/redoc/ подключена документация. В ней описаны возможные запросы к API и структура ожидаемых ответов. Для каждого запроса указаны уровни прав доступа: пользовательские роли, которым разрешён запрос.
 
-```
-git clone https://github.com/VladPronko/api_final_yatube.git
-```
+Используемые технологии: Python3, Django 2.2, Django REST Framework, SQLite3, Simple-JWT.
 
-```
-cd api_final_yatube
-```
+# Как запустить проект:
+- Клонировать репозиторий и перейти в него:
+>git clone git@github.com:VladPronko/api_final_yatube.git
 
-Cоздать и активировать виртуальное окружение:
+>cd api_final_yatube 
 
-```
-python3 -m venv venv
-```
+- Cоздать и активировать виртуальное окружение:
+>python3 -m venv venv
 
-```
-source env/bin/activate
-```
+>source venv/bin/activate
 
-Установить зависимости из файла requirements.txt:
+- Установить зависимости из файла requirements.txt:
+>python3 -m pip install --upgrade pip
 
-```
-python3 -m pip install --upgrade pip
-```
+>pip install -r requirements.txt
 
-```
-pip install -r requirements.txt
-```
+- Выполнить миграции:
+>cd yatube_api
 
-Выполнить миграции:
+>python3 manage.py migrate
 
-```
-python3 manage.py migrate
-```
-
-Запустить проект:
-
-```
-python3 manage.py runserver
-```
+- Запустить проект:
+>python3 manage.py runserver
